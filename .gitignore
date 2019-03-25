@@ -1,0 +1,7 @@
+
+.vs/*
+Library/*
+obj/*
+ProjectSettings/*
+Temp/*
+Logs/*
