@@ -79,7 +79,12 @@
     <Compile Include="Assets\Scripts\Geom\Rectf.cs" />
     <Compile Include="Assets\Scripts\Geom\Vector2f.cs" />
     <Compile Include="Assets\Scripts\Geom\Winding.cs" />
+    <Compile Include="Assets\Scripts\Map\Graph\Center.cs" />
+    <Compile Include="Assets\Scripts\Map\Graph\Corner.cs" />
+    <Compile Include="Assets\Scripts\Map\Graph\Edge.cs" />
+    <Compile Include="Assets\Scripts\Map\IsLandShape.cs" />
     <Compile Include="Assets\Scripts\Map\Map.cs" />
+    <Compile Include="Assets\Scripts\Map\PointSelector.cs" />
     <Compile Include="Assets\Scripts\Map\Utils\ParkMillerRNG.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>I:/Code/MapGen/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
