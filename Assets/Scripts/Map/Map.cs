@@ -126,4 +126,43 @@ public class Map
         NumPoints = numPoints;
         ParkMillerRng.Seed = variant;
     }
+
+    public void ImproveCorners()
+    {
+        List<Vector2f> newCorners = new List<Vector2f>(Corners.Count);
+        Vector2f point;
+
+        foreach(Corner q in Corners)
+        {
+            if(q.Border)
+            {
+                newCorners[q.Index] = q.Point;
+            }else
+            {
+                point = new Vector2f();
+                foreach(Center r in q.Touches)
+                {
+                    point.x += r.Point.x;
+                    point.y += r.Point.y;
+                }
+
+                point.x /= q.Touches.Count;
+                point.y /= q.Touches.Count;
+                newCorners[q.Index] = point;
+            }
+        }
+
+        for(int i = 0; i < Corners.Count; i++)
+        {
+            Corners[i].Point = newCorners[i];
+        }
+
+        foreach(Edge edge in Edges)
+        {
+            if(edge.v0 != null && edge.v1 != null)
+            {
+                //edge.MidPoint = Vector2f.
+            }
+        }
+    }
 }
