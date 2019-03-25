@@ -6,6 +6,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using csDelaunay;
 
 public enum IsLandShapeType // 地图的形状
 {
@@ -161,8 +162,52 @@ public class Map
         {
             if(edge.v0 != null && edge.v1 != null)
             {
-                //edge.MidPoint = Vector2f.
+                edge.MidPoint = new Vector2f((edge.v1.Point.x - edge.v0.Point.x) * 0.5,
+                                             (edge.v1.Point.y - edge.v0.Point.y) * 0.5);
             }
+        }
+    }
+
+    public List<Corner> landCorners(List<Corner> corners)
+    {
+        List<Corner> locations = new List<Corner>();
+        foreach(Corner q in corners)
+        {
+            if(!q.Ocean && !q.Coast)
+            {
+                locations.Add(q);
+            }
+        }
+        return locations;
+    }
+
+    public void BuildGraph(List<Vector2f> points, Voronoi voronoi)
+    {
+        List<csDelaunay.Edge> libedges = voronoi.Edges;
+        Dictionary<Vector2f, Center> centerLookup = new Dictionary<Vector2f, Center>();
+
+        foreach(Vector2f point in points)
+        {
+            Center p = new Center();
+            p.Index = Centers.Count;
+            p.Point = point;
+            p.Neighbors = new List<Center>();
+            p.Borders = new List<Edge>();
+            p.Corners = new List<Corner>();
+            Centers.Add(p);
+            centerLookup.Add(point, p);
+        }
+
+        foreach(Center p in Centers)
+        {
+            voronoi.Region(p.Point);
+        }
+
+        Dictionary<int, List<Corner>> _cornerMap = new Dictionary<int, List<Corner>>();
+
+        Corner makeCorner(Vector2f point)
+        {
+
         }
     }
 }

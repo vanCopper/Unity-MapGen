@@ -12,7 +12,7 @@ public class Corner
     public int Index;
     public Vector2f Point;      // 位置
     public bool Water;          // 湖或者海洋
-    public bool Oceam;          // 海洋
+    public bool Ocean;          // 海洋
     public bool Coast;          // 海岸线
     public bool Border;         // 是否为地图边缘
     public string Biome;        // 生态群类型
