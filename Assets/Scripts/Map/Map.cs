@@ -330,4 +330,60 @@ public class Map
             }
         }
     }
+
+    public void AssignCornerElevations()
+    {
+        //List<Corner> queue = new List<Corner>();
+        Stack<Corner> queue = new Stack<Corner>();
+
+        foreach(Corner q in Corners)
+        {
+            q.Water = !Inside(q.Point);
+        }
+
+        foreach(Corner q in Corners)
+        {
+            if(q.Border)
+            {
+                q.Elevation = 0;
+                queue.Push(q);
+            }else
+            {
+                q.Elevation = float.PositiveInfinity;
+            }
+        }
+
+       while(queue.Count > 0)
+        {
+            Corner q = queue.Pop();
+
+            foreach(Corner s in q.Adjacent)
+            {
+                double newElevation = 0.01f + q.Elevation;
+                if(!q.Water && !s.Water)
+                {
+                    newElevation += 1;
+                    if(NeedsMoreRandomness)
+                    {
+                        newElevation += ParkMillerRng.NextDouble();
+                    }
+                }
+
+                if (newElevation < s.Elevation)
+                {
+                    s.Elevation = newElevation;
+                    queue.Push(s);
+                }
+            }
+        }
+        
+    }
+
+
+
+    public bool Inside(Vector2f p)
+    {
+        return IslandShapeGen(new Vector2f(2*(p.x/MapSize - 0.5f), 2*(p.y/MapSize - 0.5f)));
+    }
 }
+ 

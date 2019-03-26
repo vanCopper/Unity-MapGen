@@ -16,8 +16,8 @@ public class Corner
     public bool Coast;          // 海岸线
     public bool Border;         // 是否为地图边缘
     public string Biome;        // 生态群类型
-    public float Elevation;     // 海拔 0.0 - 1.0
-    public float Moisture;      // 湿度 0.0 - 1.0
+    public double Elevation;     // 海拔 0.0 - 1.0
+    public double Moisture;      // 湿度 0.0 - 1.0
 
     public List<Center> Touches;
     public List<Edge> Protrudes;
