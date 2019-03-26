@@ -14,14 +14,14 @@ public class ParkMillerRNG
     /// <summary>
     /// 1-0x7FFFFFFF 不可使用0 作为Seed
     /// </summary>
-    public uint Seed;
+    public int Seed;
 
     public ParkMillerRNG()
     {
         Seed = 1;
     }
 
-    public uint Nextuint()
+    public int NextInt()
     {
         return Gen();
     }
@@ -41,11 +41,11 @@ public class ParkMillerRNG
     /// <param name="min"></param>
     /// <param name="max"></param>
     /// <returns></returns>
-    public uint NextUintRange(double min, double max)
+    public int NextIntRange(double min, double max)
     {
         min -= .4999;
         max += .4999;
-        return (uint)(min + ((max - min) * NextDouble()));
+        return (int)(min + ((max - min) * NextDouble()));
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public class ParkMillerRNG
         return min + ((max - min) * NextDouble());
     }
 
-    private uint Gen()
+    private int Gen()
     {
         return Seed = (Seed * 16807) % int.MaxValue;
     }

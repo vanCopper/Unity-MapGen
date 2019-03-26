@@ -505,6 +505,7 @@ public class Map
     public void CalculateWatersheds()
     {
         bool changed;
+        Corner r;
         foreach(Corner q in Corners)
         {
             q.Watershed = q;
@@ -514,12 +515,180 @@ public class Map
             }
         }
 
+        for(int i = 0; i < 100; i++)
+        {
+            changed = false;
+            foreach(Corner q in Corners)
+            {
+                if(!q.Ocean && !q.Coast && !q.Watershed.Coast)
+                {
+                    r = q.Downslope.Watershed;
+                    if(!r.Ocean)
+                    {
+                        q.Watershed = r;
+                        changed = true;
+                    }
+                }
+            }
+            if (changed) break;
+        }
 
+        foreach(Corner q in Corners)
+        {
+            r = q.Watershed;
+            r.WatershedSize = 1 + r.WatershedSize;
+        }
+    }
+
+    public void CreateRivers()
+    {
+        Corner q;
+        Edge edge;
+        for(int i = 0; i < MapSize/2; i++)
+        {
+            q = Corners[ParkMillerRng.NextIntRange(0, Corners.Count - 1)];
+            if (q.Ocean || q.Elevation < 0.3 || q.Elevation > 0.9) continue;
+            while(!q.Coast)
+            {
+                if (q == q.Downslope) break;
+
+                edge = LookupEdgeFromCorner(q, q.Downslope);
+                edge.River = edge.River + 1;
+                q.River = q.River + 1;
+                q.Downslope.River = q.Downslope.River + 1;
+                q = q.Downslope;
+            }
+        }
+    }
+
+    public void AssignCornerMoisture()
+    {
+        Stack<Corner> queue = new Stack<Corner>();
+        double newMoisture;
+        foreach(Corner q in Corners)
+        {
+            if((q.Water || q.River > 0) && !q.Ocean)
+            {
+                q.Moisture = q.River > 0 ? Mathf.Min(3.0f, (0.2f * q.River)) : 1.0f;
+                queue.Push(q);
+            }else
+            {
+                q.Moisture = 0.0;
+            }
+        }
+        
+        while(queue.Count > 0)
+        {
+            Corner q = queue.Pop();
+            foreach(Corner r in q.Adjacent)
+            {
+                newMoisture = q.Moisture * 0.9;
+                if(newMoisture > r.Moisture)
+                {
+                    r.Moisture = newMoisture;
+                    queue.Push(r);
+                }
+            }
+        }
+        
+        foreach(Corner q in Corners)
+        {
+            if(q.Ocean || q.Coast)
+            {
+                q.Moisture = 1.0;
+            }
+        }
+    }
+
+    public void AssignPolygonMoisture()
+    {
+        double sumMoisture;
+        foreach(Center p in Centers)
+        {
+            sumMoisture = 0.0;
+            foreach(Corner q in p.Corners)
+            {
+                if (q.Moisture > 1.0) q.Moisture = 1.0;
+                sumMoisture += q.Moisture;
+            }
+            p.Moisture = sumMoisture / p.Corners.Count;
+        }
+    }
+
+    public void AssignBiomes()
+    {
+        foreach(Center p in Centers)
+        {
+            p.Biome = GetBiome(p);
+        }
+    }
+
+    public Edge LookupEdgeFromCenter(Center p, Center r)
+    {
+        foreach(Edge edge in p.Borders)
+        {
+            if (edge.d0 == r || edge.d1 == r) return edge;
+        }
+        return null;
+    }
+
+    public Edge LookupEdgeFromCorner(Corner q, Corner s)
+    {
+        foreach(Edge edge in q.Protrudes)
+        {
+            if (edge.v0 == s || edge.v1 == s) return edge;
+        }
+        return null;
     }
 
     public bool Inside(Vector2f p)
     {
         return IslandShapeGen(new Vector2f(2*(p.x/MapSize - 0.5f), 2*(p.y/MapSize - 0.5f)));
+    }
+
+    public static string GetBiome(Center p)
+    {
+        if (p.Ocean)
+        {
+            return "OCEAN";
+        }
+        else if (p.Water)
+        {
+            if (p.Elevation < 0.1) return "MARSH";
+            if (p.Elevation > 0.8) return "ICE";
+            return "LAKE";
+        }
+        else if (p.Coast)
+        {
+            return "BEACH";
+        }
+        else if (p.Elevation > 0.8)
+        {
+            if (p.Moisture > 0.50) return "SNOW";
+            else if (p.Moisture > 0.33) return "TUNDRA";
+            else if (p.Moisture > 0.16) return "BARE";
+            else return "SCORCHED";
+        }
+        else if (p.Elevation > 0.6)
+        {
+            if (p.Moisture > 0.66) return "TAIGA";
+            else if (p.Moisture > 0.33) return "SHRUBLAND";
+            else return "TEMPERATE_DESERT";
+        }
+        else if (p.Elevation > 0.3)
+        {
+            if (p.Moisture > 0.83) return "TEMPERATE_RAIN_FOREST";
+            else if (p.Moisture > 0.50) return "TEMPERATE_DECIDUOUS_FOREST";
+            else if (p.Moisture > 0.16) return "GRASSLAND";
+            else return "TEMPERATE_DESERT";
+        }
+        else
+        {
+            if (p.Moisture > 0.66) return "TROPICAL_RAIN_FOREST";
+            else if (p.Moisture > 0.33) return "TROPICAL_SEASONAL_FOREST";
+            else if (p.Moisture > 0.16) return "GRASSLAND";
+            else return "SUBTROPICAL_DESERT";
+        }
     }
 }
  
