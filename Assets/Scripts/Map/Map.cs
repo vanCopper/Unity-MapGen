@@ -379,7 +379,143 @@ public class Map
         
     }
 
+    public void RedistributeElevations(List<Corner> locations)
+    {
+        double SCALE_FACTOR = 1.1f;
+        double y;
+        double x;
+        locations.Sort((a,b) => a.Elevation.CompareTo(b.Elevation));
 
+        for(int i = 0; i < locations.Count; i++)
+        {
+            y = i / locations.Count - 1;
+            x = System.Math.Sqrt(SCALE_FACTOR) - System.Math.Sqrt(SCALE_FACTOR * (1-y));
+            if (x > 1.0) x = 1.0;
+            locations[i].Elevation = x;
+        }
+    }
+
+    public void RedistributeMoisture(List<Corner> locations)
+    {
+        locations.Sort((a, b) => a.Moisture.CompareTo(b.Moisture));
+        for(int i = 0; i<locations.Count; i++)
+        {
+            locations[i].Moisture = i / locations.Count - 1;
+        }
+    }
+
+    public void AssignOceanCoastAndLand()
+    {
+        Stack<Center> queue = new Stack<Center>();
+        int numWater;
+        foreach(Center p in Centers)
+        {
+            numWater = 0;
+            foreach(Corner q in p.Corners)
+            {
+                if(q.Border)
+                {
+                    p.Border = true;
+                    p.Ocean = true;
+                    q.Water = true;
+                    queue.Push(p);
+                }
+
+                if(q.Water)
+                {
+                    numWater += 1;
+                }
+            }
+
+            p.Water = (p.Ocean || numWater >= p.Corners.Count * LAKE_THRESHOLD);
+        }
+
+        while(queue.Count > 0)
+        {
+            Center p = queue.Pop();
+            foreach(Center r in p.Neighbors)
+            {
+                if(r.Water && !r.Ocean)
+                {
+                    r.Ocean = true;
+                    queue.Push(r);
+                }
+            }
+        }
+       
+        foreach(Center p in Centers)
+        {
+            int numOcena = 0;
+            int numLand = 0;
+            foreach(Center r in p.Neighbors)
+            {
+                if (r.Ocean) numOcena++;
+                if (!r.Water) numLand++;
+            }
+            p.Coast = (numOcena > 0) && (numLand > 0);
+        }
+       
+        foreach(Corner c in Corners)
+        {
+            int numOcean = 0;
+            int numLand = 0;
+            foreach(Center p in c.Touches)
+            {
+                if (p.Ocean) numOcean++;
+                if (!p.Water) numLand++;
+            }
+            c.Ocean = (numOcean == c.Touches.Count);
+            c.Coast = (numOcean > 0) && (numLand > 0);
+            c.Water = c.Border || ((numLand != c.Touches.Count) && !c.Coast);
+        }
+    }
+
+    public void AssignPolygonElevations()
+    {
+        double sumElevation;
+        foreach(Center p in Centers)
+        {
+            sumElevation = 0.0;
+            foreach(Corner q in p.Corners)
+            {
+                sumElevation += q.Elevation;
+            }
+
+            p.Elevation = sumElevation / p.Corners.Count;
+        }
+    }
+
+    public void CalculateDownslopes()
+    {
+        Corner r;
+        foreach(Corner q in Corners)
+        {
+            r = q;
+            foreach(Corner s in q.Adjacent)
+            {
+                if(s.Elevation <= r.Elevation)
+                {
+                    r = s;
+                }
+            }
+            q.Downslope = r;
+        }
+    }
+
+    public void CalculateWatersheds()
+    {
+        bool changed;
+        foreach(Corner q in Corners)
+        {
+            q.Watershed = q;
+            if(!q.Ocean && !q.Coast)
+            {
+                q.Watershed = q.Downslope;
+            }
+        }
+
+
+    }
 
     public bool Inside(Vector2f p)
     {
