@@ -88,7 +88,7 @@ public class Map
         if (Centers == null) Centers = new List<Center>();
     }
 
-    public void NewIsLand(IsLandShapeType islandType, PointType pointType, int numPoints, int seed, uint variant )
+    public void NewIsLand(IsLandShapeType islandType, PointType pointType, int numPoints, int seed, int variant )
     {
         switch(islandType)
         {
