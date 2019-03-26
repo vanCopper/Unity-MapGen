@@ -207,7 +207,127 @@ public class Map
 
         Corner makeCorner(Vector2f point)
         {
+            if (point == null) return null;
+            Corner q = null;
+            int bucket;
+            for (bucket = (int)point.x - 1; bucket <= (int)point.x + 1; bucket++)
+            {
+                List<Corner> corners;
+                if(_cornerMap.TryGetValue(bucket, out corners))
+                {
+                    for(int j = 0; j < corners.Count; j++)
+                    {
+                        q = corners[j];
+                        float dx = point.x - q.Point.x;
+                        float dy = point.y - q.Point.y;
+                        if(dx*dx + dy*dy < 0.000001)
+                        {
+                            return q;
+                        }
+                    }
+                }
+            }
 
+            bucket = (int)point.x;
+            if(!_cornerMap.ContainsKey(bucket))
+            {
+                _cornerMap.Add(bucket, new List<Corner>());
+            }
+
+            q = new Corner();
+            q.Index = Corners.Count;
+            Corners.Add(q);
+            q.Point = point;
+            q.Border = (point.x == 0 || point.x == MapSize
+                        || point.y == 0 || point.y == MapSize);
+            q.Touches = new List<Center>();
+            q.Protrudes = new List<Edge>();
+            q.Adjacent = new List<Corner>();
+            _cornerMap[bucket].Add(q);
+
+            return q;
+        }
+
+        void addToCornerList(List<Corner> v, Corner x)
+        {
+            if (x != null && !v.Contains(x)) v.Add(x);
+        }
+
+        void addToCenterList(List<Center> v, Center x)
+        {
+            if (x != null && !v.Contains(x)) v.Add(x);
+        }
+
+        foreach(csDelaunay.Edge libedge in libedges)
+        {
+            LineSegment dedge = libedge.DelaunayLine();
+            LineSegment vedge = libedge.VoronoiEdge();
+
+            Edge edge = new Edge();
+            edge.Index = Edges.Count;
+            edge.River = 0;
+            Edges.Add(edge);
+            if (vedge.p0 != null && vedge.p1 != null)
+            {
+                edge.MidPoint = new Vector2f((vedge.p0.x - vedge.p1.x) * 0.5,
+                                             (vedge.p0.y - vedge.p1.y) * 0.5);
+            }
+
+            // 边指向角
+            edge.v0 = makeCorner(vedge.p0);
+            edge.v1 = makeCorner(vedge.p1);
+            // 边指向中心
+            Center d0Center;
+            if(centerLookup.TryGetValue(dedge.p0, out d0Center))
+            {
+                edge.d0 = d0Center;
+            }
+            Center d1Center;
+            if(centerLookup.TryGetValue(dedge.p1, out d1Center))
+            {
+                edge.d1 = d1Center;
+            }
+
+            //中心指向边，角指向边
+            if (edge.d0 != null) edge.d0.Borders.Add(edge);
+            if (edge.d1 != null) edge.d1.Borders.Add(edge);
+            if (edge.v0 != null) edge.v0.Protrudes.Add(edge);
+            if (edge.v1 != null) edge.v1.Protrudes.Add(edge);
+            
+            if(edge.d0 != null && edge.d1 != null)
+            {
+                addToCenterList(edge.d0.Neighbors, edge.d1);
+                addToCenterList(edge.d1.Neighbors, edge.d0);
+            }
+
+            if(edge.v0 != null && edge.v1 != null)
+            {
+                addToCornerList(edge.v0.Adjacent, edge.v1);
+                addToCornerList(edge.v1.Adjacent, edge.v0);
+            }
+
+            if (edge.d0 != null)
+            {
+                addToCornerList(edge.d0.Corners, edge.v0);
+                addToCornerList(edge.d0.Corners, edge.v1);
+            }
+            if (edge.d1 != null)
+            {
+                addToCornerList(edge.d1.Corners, edge.v0);
+                addToCornerList(edge.d1.Corners, edge.v1);
+            }
+
+            // Corners point to centers
+            if (edge.v0 != null)
+            {
+                addToCenterList(edge.v0.Touches, edge.d0);
+                addToCenterList(edge.v0.Touches, edge.d1);
+            }
+            if (edge.v1 != null)
+            {
+                addToCenterList(edge.v1.Touches, edge.d0);
+                addToCenterList(edge.v1.Touches, edge.d1);
+            }
         }
     }
 }

@@ -4,109 +4,124 @@ using System.Collections.Generic;
 
 namespace csDelaunay {
 
-	/*
+    /*
 	 * The line segment connecting the two Sites is part of the Delaunay triangulation
 	 * The line segment connecting the two Vertices is part of the Voronoi diagram
 	 */
-	public class Edge {
+    public class Edge {
 
-		#region Pool
-		private static Queue<Edge> pool = new Queue<Edge>();
-		
-		private static int nEdges = 0;
-		/*
+        #region Pool
+        private static Queue<Edge> pool = new Queue<Edge>();
+
+        private static int nEdges = 0;
+        /*
 		 * This is the only way to create a new Edge
 		 * @param site0
 		 * @param site1
 		 * @return
 		 */
-		public static Edge CreateBisectingEdge(Site s0, Site s1) {
-			float dx, dy;
-			float absdx, absdy;
-			float a, b, c;
+        public static Edge CreateBisectingEdge(Site s0, Site s1) {
+            float dx, dy;
+            float absdx, absdy;
+            float a, b, c;
 
-			dx = s1.x - s0.x;
-			dy = s1.y - s0.y;
-			absdx = dx > 0 ? dx : -dx;
-			absdy = dy > 0 ? dy : -dy;
-			c = s0.x * dx + s0.y * dy + (dx*dx + dy*dy) * 0.5f;
+            dx = s1.x - s0.x;
+            dy = s1.y - s0.y;
+            absdx = dx > 0 ? dx : -dx;
+            absdy = dy > 0 ? dy : -dy;
+            c = s0.x * dx + s0.y * dy + (dx * dx + dy * dy) * 0.5f;
 
-			if (absdx > absdy) {
-				a = 1;
-				b = dy/dx;
-				c /= dx;
-			} else {
-				b = 1;
-				a = dx/dy;
-				c/= dy;
-			}
+            if (absdx > absdy) {
+                a = 1;
+                b = dy / dx;
+                c /= dx;
+            } else {
+                b = 1;
+                a = dx / dy;
+                c /= dy;
+            }
 
-			Edge edge = Edge.Create();
+            Edge edge = Edge.Create();
 
-			edge.LeftSite = s0;
-			edge.RightSite = s1;
-			s0.AddEdge(edge);
-			s1.AddEdge(edge);
+            edge.LeftSite = s0;
+            edge.RightSite = s1;
+            s0.AddEdge(edge);
+            s1.AddEdge(edge);
 
-			edge.a = a;
-			edge.b = b;
-			edge.c = c;
+            edge.a = a;
+            edge.b = b;
+            edge.c = c;
 
-			return edge;
-		}
+            return edge;
+        }
 
-		private static Edge Create() {
-			Edge edge;
-			if (pool.Count > 0) {
-				edge = pool.Dequeue();
-				edge.Init();
-			} else {
-				edge = new Edge();
-			}
+        private static Edge Create() {
+            Edge edge;
+            if (pool.Count > 0) {
+                edge = pool.Dequeue();
+                edge.Init();
+            } else {
+                edge = new Edge();
+            }
 
-			return edge;
-		}
-		#endregion
+            return edge;
+        }
+        #endregion
 
-		public static List<Edge> SelectEdgesForSitePoint(Vector2f coord, List<Edge> edgesToTest) {
-			return edgesToTest.FindAll(
-			delegate(Edge e) {
-				if (e.LeftSite != null) {
-					if (e.LeftSite.Coord == coord) return true;
-				}
-				if (e.RightSite != null) {
-					if (e.RightSite.Coord == coord) return true;
-				}
-				return false;
-			});
-		}
+        public static List<Edge> SelectEdgesForSitePoint(Vector2f coord, List<Edge> edgesToTest) {
+            return edgesToTest.FindAll(
+            delegate (Edge e) {
+                if (e.LeftSite != null) {
+                    if (e.LeftSite.Coord == coord) return true;
+                }
+                if (e.RightSite != null) {
+                    if (e.RightSite.Coord == coord) return true;
+                }
+                return false;
+            });
+        }
 
-		public static readonly Edge DELETED = new Edge();
+        public static readonly Edge DELETED = new Edge();
 
-		#region Object
-		// The equation of the edge: ax + by = c
-		public float a,b,c;
+        #region Object
+        // The equation of the edge: ax + by = c
+        public float a, b, c;
 
-		// The two Voronoi vertices that the edge connects (if one of them is null, the edge extends to infinity)
-		private Vertex leftVertex;
-		public Vertex LeftVertex {get{return leftVertex;}}
+        // The two Voronoi vertices that the edge connects (if one of them is null, the edge extends to infinity)
+        private Vertex leftVertex;
+        public Vertex LeftVertex { get { return leftVertex; } }
 
-		private Vertex rightVertex;
-		public Vertex RightVertex {get{return rightVertex;}}
+        private Vertex rightVertex;
+        public Vertex RightVertex { get { return rightVertex; } }
 
-		public Vertex Vertex(LR leftRight) {
-			return leftRight == LR.LEFT ? leftVertex : rightVertex;
-		}
+        public Vertex Vertex(LR leftRight) {
+            return leftRight == LR.LEFT ? leftVertex : rightVertex;
+        }
 
-		public void SetVertex(LR leftRight, Vertex v) {
-			if (leftRight == LR.LEFT) {
-				leftVertex = v;
-			} else {
-				rightVertex = v;
-			}
-		}
+        public void SetVertex(LR leftRight, Vertex v) {
+            if (leftRight == LR.LEFT) {
+                leftVertex = v;
+            } else {
+                rightVertex = v;
+            }
+        }
 
-		public bool IsPartOfConvexHull() {
+        public LineSegment DelaunayLine()
+        {
+            return new LineSegment(LeftSite.Coord, RightSite.Coord);
+        }
+
+        public LineSegment VoronoiEdge()
+        {
+            if(!Visible())
+            {
+                return new LineSegment(Vector2f.zero, Vector2f.zero);
+            }
+
+            return new LineSegment(clippedVertices[LR.LEFT], clippedVertices[LR.RIGHT]);
+        }
+
+        public bool IsPartOfConvexHull() {
 			return leftVertex == null || rightVertex == null;
 		}
 
