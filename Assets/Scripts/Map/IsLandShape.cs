@@ -10,11 +10,11 @@ using System.Collections.Generic;
 public class IsLandShape
 {
     static public double ISLAND_FACTOR = 1.07;
-    public static IsLandShapeGen MakeRadial(int seed)
+    public static IsLandShapeGen MakeRadial(uint seed)
     {
         ParkMillerRNG isLandRandom = new ParkMillerRNG();
         isLandRandom.Seed = seed;
-        int bumps = isLandRandom.NextIntRange(1, 6);
+        uint bumps = isLandRandom.NextIntRange(1, 6);
         double startAngle = isLandRandom.NextDoubleRange(0, 2 * Mathf.PI);
         double dipAngle = isLandRandom.NextDoubleRange(0, 2 * Mathf.PI);
         double dipWidth = isLandRandom.NextDoubleRange(0.2, 0.7);
@@ -41,7 +41,7 @@ public class IsLandShape
         return islandShapeGen;
     }
 
-    public static IsLandShapeGen MakePerlin(int seed)
+    public static IsLandShapeGen MakePerlin(uint seed)
     {
         bool inside(Vector2f q)
         {
@@ -56,7 +56,7 @@ public class IsLandShape
         return islandShapeGen;
     }
 
-    public static IsLandShapeGen MakeSquare(int seed)
+    public static IsLandShapeGen MakeSquare(uint seed)
     {
         bool inside(Vector2f q)
         {

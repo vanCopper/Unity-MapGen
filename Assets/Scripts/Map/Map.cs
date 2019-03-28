@@ -53,6 +53,11 @@ public class Map
         Reset();
     }
 
+    public void MapGen()
+    {
+        Points = PointSelectorGen(NumPoints);
+    }
+
     public void Reset()
     {
         if (Points != null) Points.Clear();
@@ -88,7 +93,7 @@ public class Map
         if (Centers == null) Centers = new List<Center>();
     }
 
-    public void NewIsLand(IsLandShapeType islandType, PointType pointType, int numPoints, int seed, int variant )
+    public void NewIsLand(IsLandShapeType islandType, PointType pointType, int numPoints, uint seed, uint variant )
     {
         switch(islandType)
         {
@@ -207,8 +212,9 @@ public class Map
 
         Corner makeCorner(Vector2f point)
         {
-            if (point == null) return null;
             Corner q = null;
+            if (point == null) return q;
+
             int bucket;
             for (bucket = (int)point.x - 1; bucket <= (int)point.x + 1; bucket++)
             {
@@ -546,7 +552,7 @@ public class Map
         Edge edge;
         for(int i = 0; i < MapSize/2; i++)
         {
-            q = Corners[ParkMillerRng.NextIntRange(0, Corners.Count - 1)];
+            q = Corners[(int)ParkMillerRng.NextIntRange(0, Corners.Count - 1)];
             if (q.Ocean || q.Elevation < 0.3 || q.Elevation > 0.9) continue;
             while(!q.Coast)
             {

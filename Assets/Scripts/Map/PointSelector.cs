@@ -17,7 +17,7 @@ public class PointSelector
         return type == PointType.Square || type == PointType.Hexagon;
     }
 
-    public static PointGen generateRandom(int size, int seed)
+    public static PointGen generateRandom(int size, uint seed)
     {
         List<Vector2f> generate(int numPoint)
         {
@@ -26,8 +26,9 @@ public class PointSelector
             List<Vector2f> points = new List<Vector2f>();
             for(int i = 0; i < numPoint; i++)
             {
-                Vector2f p = new Vector2f(mapRandom.NextDoubleRange(10, size - 10),
-                                          mapRandom.NextDoubleRange(10, size - 10));
+                double mx = mapRandom.NextDoubleRange(10, size - 10);
+                double my = mapRandom.NextDoubleRange(10, size - 10);
+                Vector2f p = new Vector2f(mx,my);
                 points.Add(p);
             }
             return points;
@@ -37,7 +38,7 @@ public class PointSelector
         return pGen;
     }
 
-    public static PointGen generateRelaxed(int size, int seed)
+    public static PointGen generateRelaxed(int size, uint seed)
     {
         List<Vector2f> generate(int numPoint)
         {
@@ -65,14 +66,14 @@ public class PointSelector
                 voronoi.Dispose();
             }
 
-            return new List<Vector2f>();
+            return points;
         }
 
         PointGen pGen = generate;
         return pGen;
     }
 
-    public static PointGen generateSquare(int size, int seed)
+    public static PointGen generateSquare(int size, uint seed)
     {
         List<Vector2f> generate(int numPoint)
         {
@@ -92,7 +93,7 @@ public class PointSelector
         return pGen;
     }
 
-    public static PointGen generateHexagon(int size, int seed)
+    public static PointGen generateHexagon(int size, uint seed)
     {
         List<Vector2f> generate(int numPoint)
         {
