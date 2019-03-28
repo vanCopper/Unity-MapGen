@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class MapGen : MonoBehaviour
 {
+    private Material m_DebugMat;
     private Map m_Map;
     private int m_MapSize = 256;
 
@@ -23,14 +24,34 @@ public class MapGen : MonoBehaviour
         List<Vector2f> points =  m_Map.Points;
         Debug.Log(points);
 
-        Image image = GetComponent<Image>();
-        Canvas canvas = GetComponent<Canvas>();
-        //image.
+        Shader shader = Shader.Find("Hidden/Internal-Colored");
+
+        m_DebugMat = new Material(shader);
+        m_DebugMat.hideFlags = HideFlags.HideAndDontSave;
+        m_DebugMat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        m_DebugMat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m_DebugMat.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
+        m_DebugMat.SetInt("_ZWrite", 0);
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    private void OnPostRender()
+    {
+        //GL
+        m_DebugMat.SetPass(0);
+        GL.PushMatrix();
+        GL.LoadOrtho();
+        GL.Begin(GL.LINES);
+
+        GL.Vertex3(0, 0, 0);
+        GL.Vertex3(0.1f, 0.1f, 0);
+
+        GL.End();
+        GL.PopMatrix();
     }
 }
