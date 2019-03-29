@@ -8,6 +8,7 @@ public class MapGen : MonoBehaviour
     private Material m_DebugMat;
     private Map m_Map;
     private int m_MapSize = 256;
+    private List<Vector2f> points;
 
     //private string m_IslandType = "Perlin";
     private static uint m_IslandSeedInitial = 85882;
@@ -18,20 +19,13 @@ public class MapGen : MonoBehaviour
     void Start()
     {
         m_Map = new Map(m_MapSize);
-        m_Map.NewIsLand(IsLandShapeType.Perlin, PointType.Square, m_NumPoints, m_IslandSeedInitial, 0);
+        m_Map.NewIsLand(IsLandShapeType.Perlin, PointType.Random, m_NumPoints, m_IslandSeedInitial, 0);
         m_Map.Reset();
         m_Map.MapGen();
-        List<Vector2f> points =  m_Map.Points;
+        points =  m_Map.Points;
         Debug.Log(points);
 
-        Shader shader = Shader.Find("Hidden/Internal-Colored");
-
-        m_DebugMat = new Material(shader);
-        m_DebugMat.hideFlags = HideFlags.HideAndDontSave;
-        m_DebugMat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        m_DebugMat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-        m_DebugMat.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
-        m_DebugMat.SetInt("_ZWrite", 0);
+        
     }
 
     // Update is called once per frame
@@ -43,15 +37,13 @@ public class MapGen : MonoBehaviour
     private void OnPostRender()
     {
         //GL
-        m_DebugMat.SetPass(0);
-        GL.PushMatrix();
-        GL.LoadOrtho();
-        GL.Begin(GL.LINES);
+        if (points == null || points.Count == 0) return;
 
-        GL.Vertex3(0, 0, 0);
-        GL.Vertex3(0.1f, 0.1f, 0);
+        GLHelper.InitDebugMat();
 
-        GL.End();
-        GL.PopMatrix();
+        foreach(Vector2f p in points)
+        {
+            GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.1f);
+        }
     }
 }
