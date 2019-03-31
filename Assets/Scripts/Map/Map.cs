@@ -56,6 +56,12 @@ public class Map
     public void MapGen()
     {
         Points = PointSelectorGen(NumPoints);
+        Voronoi voronoi = new Voronoi(Points, new Rectf(0, 0, MapSize, MapSize));
+        BuildGraph(Points, voronoi);
+        ImproveCorners();
+        voronoi.Dispose();
+        voronoi = null;
+        Points = null;
     }
 
     public void Reset()
@@ -142,7 +148,7 @@ public class Map
         {
             if(q.Border)
             {
-                newCorners[q.Index] = q.Point;
+                newCorners.Insert(q.Index, q.Point);
             }else
             {
                 point = new Vector2f();
@@ -154,7 +160,7 @@ public class Map
 
                 point.x /= q.Touches.Count;
                 point.y /= q.Touches.Count;
-                newCorners[q.Index] = point;
+                newCorners.Insert(q.Index, point);
             }
         }
 

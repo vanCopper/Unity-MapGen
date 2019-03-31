@@ -7,8 +7,9 @@ public class MapGen : MonoBehaviour
 {
     private Material m_DebugMat;
     private Map m_Map;
-    private int m_MapSize = 256;
-    private List<Vector2f> points;
+    private int m_MapSize = 512;
+    private List<Vector2f> m_Points;
+    private List<Center> m_Centers;
 
     //private string m_IslandType = "Perlin";
     private static uint m_IslandSeedInitial = 85882;
@@ -22,10 +23,9 @@ public class MapGen : MonoBehaviour
         m_Map.NewIsLand(IsLandShapeType.Perlin, PointType.Random, m_NumPoints, m_IslandSeedInitial, 0);
         m_Map.Reset();
         m_Map.MapGen();
-        points =  m_Map.Points;
-        Debug.Log(points);
-
-        
+        m_Points =  m_Map.Points;
+        m_Centers = m_Map.Centers;
+        Debug.Log(m_Points);
     }
 
     // Update is called once per frame
@@ -37,13 +37,25 @@ public class MapGen : MonoBehaviour
     private void OnPostRender()
     {
         //GL
-        if (points == null || points.Count == 0) return;
-
-        GLHelper.InitDebugMat();
-
-        foreach(Vector2f p in points)
+        if (m_Points != null && m_Points.Count != 0)
         {
-            GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.1f);
+            GLHelper.InitDebugMat();
+
+            foreach (Vector2f p in m_Points)
+            {
+                GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.5f);
+            }
         }
+
+        if(m_Centers != null && m_Centers.Count != 0)
+        {
+            GLHelper.InitDebugMat();
+            foreach(Center c in m_Centers)
+            {
+                GLHelper.DrawCircle(c.Point.x, c.Point.y, 0, 1f, 0.5f);
+            }
+            //m_Centers = null;
+        }
+
     }
 }

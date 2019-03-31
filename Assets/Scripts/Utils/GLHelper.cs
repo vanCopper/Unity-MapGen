@@ -13,6 +13,7 @@ public class GLHelper
 
     public static void InitDebugMat()
     {
+        if (m_DebugMat != null) return;
         Shader shader = Shader.Find("Hidden/Internal-Colored");
 
         m_DebugMat = new Material(shader);
@@ -25,6 +26,7 @@ public class GLHelper
     }
     public static void DrawCircle(float x, float y, float z, float r, float accuracy)
     {
+        //GL.Clear(false, true, Color.blue);
         GL.PushMatrix();
         //绘制2D图像    
         GL.LoadOrtho();
