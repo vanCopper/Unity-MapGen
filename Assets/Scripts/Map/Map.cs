@@ -173,8 +173,9 @@ public class Map
         {
             if(edge.v0 != null && edge.v1 != null)
             {
-                edge.MidPoint = new Vector2f((edge.v1.Point.x - edge.v0.Point.x) * 0.5,
-                                             (edge.v1.Point.y - edge.v0.Point.y) * 0.5);
+                //edge.MidPoint = new Vector2f((edge.v1.Point.x - edge.v0.Point.x) * 0.5,
+                //                             (edge.v1.Point.y - edge.v0.Point.y) * 0.5);
+                edge.MidPoint = Map.Lerp(edge.v0.Point, edge.v1.Point, 0.5f);
             }
         }
     }
@@ -281,8 +282,9 @@ public class Map
             Edges.Add(edge);
             if (vedge.p0 != null && vedge.p1 != null)
             {
-                edge.MidPoint = new Vector2f((vedge.p0.x - vedge.p1.x) * 0.5,
-                                             (vedge.p0.y - vedge.p1.y) * 0.5);
+                //edge.MidPoint = new Vector2f((vedge.p0.x - vedge.p1.x) * 0.5,
+                //(vedge.p0.y - vedge.p1.y) * 0.5);
+                edge.MidPoint = Map.Lerp(vedge.p0, vedge.p1, 0.5f);
             }
 
             // 边指向角
@@ -656,6 +658,19 @@ public class Map
     public bool Inside(Vector2f p)
     {
         return IslandShapeGen(new Vector2f(2*(p.x/MapSize - 0.5f), 2*(p.y/MapSize - 0.5f)));
+    }
+
+    public static float Lerp(float a, float b, float by)
+    {
+        //return a * (1 - b) + b * by;
+        return a + (b - a) * by;
+    }
+
+    public static Vector2f Lerp(Vector2f a, Vector2f b, float by)
+    {
+        float retX = Lerp(a.x, b.x, by);
+        float retY = Lerp(a.y, b.y, by);
+        return new Vector2f(retX, retY);
     }
 
     public static string GetBiome(Center p)

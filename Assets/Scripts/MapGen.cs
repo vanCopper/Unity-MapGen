@@ -52,6 +52,14 @@ public class MapGen : MonoBehaviour
             GLHelper.InitDebugMat();
             foreach(Center c in m_Centers)
             {
+                foreach(Edge edge in c.Borders)
+                {
+                    if(edge.v0 != null && edge.v1 != null)
+                    {
+                        GLHelper.DrawLine(new Vector3(c.Point.x, c.Point.y, 0), new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
+                        GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0));
+                    }
+                }
                 GLHelper.DrawCircle(c.Point.x, c.Point.y, 0, 1f, 0.5f);
             }
             //m_Centers = null;

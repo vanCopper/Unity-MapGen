@@ -13,7 +13,7 @@ public class GLHelper
 
     public static void InitDebugMat()
     {
-        if (m_DebugMat != null) return;
+        //if (m_DebugMat != null) return;
         Shader shader = Shader.Find("Hidden/Internal-Colored");
 
         m_DebugMat = new Material(shader);
@@ -24,6 +24,19 @@ public class GLHelper
         m_DebugMat.SetInt("_ZWrite", 0);
         m_DebugMat.SetPass(0);
     }
+
+    public static void DrawLine(Vector3 startPoint, Vector3 endPoint)
+    {
+        GL.LoadOrtho();
+        GL.PushMatrix();
+        GL.Begin(GL.LINES);
+        GL.Color(Color.green);
+        GL.Vertex(new Vector3(startPoint.x / Screen.width, startPoint.y / Screen.height, 0));
+        GL.Vertex(new Vector3(endPoint.x / Screen.width, endPoint.y / Screen.height, 0));
+        GL.End();
+        GL.PopMatrix();
+    }
+
     public static void DrawCircle(float x, float y, float z, float r, float accuracy)
     {
         //GL.Clear(false, true, Color.blue);
