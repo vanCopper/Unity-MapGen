@@ -25,19 +25,19 @@ public class GLHelper
         m_DebugMat.SetPass(0);
     }
 
-    public static void DrawLine(Vector3 startPoint, Vector3 endPoint)
+    public static void DrawLine(Vector3 startPoint, Vector3 endPoint, Color color)
     {
         //GL.LoadOrtho();
         //GL.PushMatrix();
         GL.Begin(GL.LINES);
-        GL.Color(Color.green);
+        GL.Color(color);
         GL.Vertex(new Vector3(startPoint.x / Screen.width, startPoint.y / Screen.height, 0));
         GL.Vertex(new Vector3(endPoint.x / Screen.width, endPoint.y / Screen.height, 0));
         GL.End();
         //GL.PopMatrix();
     }
 
-    public static void DrawCircle(float x, float y, float z, float r, float accuracy)
+    public static void DrawCircle(float x, float y, float z, float r, float accuracy, Color color)
     {
         //GL.Clear(false, true, Color.blue);
         GL.PushMatrix();
@@ -69,22 +69,22 @@ public class GLHelper
 
             //绘制线段
             GL.Begin(GL.LINES);
-            GL.Color(Color.red);
+            GL.Color(color);
             GL.Vertex(new Vector3(x1 / Screen.width, y1 / Screen.height, z));
             GL.Vertex(new Vector3(x3 / Screen.width, y3 / Screen.height, z));
             GL.End();
             GL.Begin(GL.LINES);
-            GL.Color(Color.red);
+            GL.Color(color);
             GL.Vertex(new Vector3(x2 / Screen.width, y1 / Screen.height, z));
             GL.Vertex(new Vector3(x4 / Screen.width, y3 / Screen.height, z));
             GL.End();
             GL.Begin(GL.LINES);
-            GL.Color(Color.red);
+            GL.Color(color);
             GL.Vertex(new Vector3(x1 / Screen.width, y2 / Screen.height, z));
             GL.Vertex(new Vector3(x3 / Screen.width, y4 / Screen.height, z));
             GL.End();
             GL.Begin(GL.LINES);
-            GL.Color(Color.red);
+            GL.Color(color);
             GL.Vertex(new Vector3(x2 / Screen.width, y2 / Screen.height, z));
             GL.Vertex(new Vector3(x4 / Screen.width, y4 / Screen.height, z));
             GL.End();

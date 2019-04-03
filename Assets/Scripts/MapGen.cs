@@ -43,7 +43,7 @@ public class MapGen : MonoBehaviour
 
             foreach (Vector2f p in m_Points)
             {
-                GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.5f);
+                GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.5f, Color.red);
             }
         }
 
@@ -58,12 +58,15 @@ public class MapGen : MonoBehaviour
                 {
                     if(edge.v0 != null && edge.v1 != null)
                     {
-                        //GLHelper.DrawLine(new Vector3(c.Point.x, c.Point.y, 0), new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
-                        GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0));
+                        GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.green);
                     }
                 }
-                GLHelper.DrawCircle(c.Point.x, c.Point.y, 0, 1f, 0.5f);
-                //break;
+                GLHelper.DrawCircle(c.Point.x, c.Point.y, 0, 1f, 0.5f, Color.red);
+
+                foreach(Corner corner in c.Corners)
+                {
+                    GLHelper.DrawCircle(corner.Point.x, corner.Point.y, 0, 1.5f, 0.5f, Color.white);
+                }
             }
             GL.PopMatrix();
             //m_Centers = null;
