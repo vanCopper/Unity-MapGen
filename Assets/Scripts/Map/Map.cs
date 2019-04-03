@@ -233,7 +233,7 @@ public class Map
                         q = corners[j];
                         float dx = point.x - q.Point.x;
                         float dy = point.y - q.Point.y;
-                        if(dx*dx + dy*dy < 0.000001)
+                        if(dx*dx + dy*dy < 0.000001f)
                         {
                             return q;
                         }

@@ -15,7 +15,7 @@ public class MapGen : MonoBehaviour
     private static uint m_IslandSeedInitial = 85882;
     // Point distribution
     //private string m_PointType = "Relaxed";
-    private int m_NumPoints = 2000;
+    private int m_NumPoints = 1000;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,18 +50,22 @@ public class MapGen : MonoBehaviour
         if(m_Centers != null && m_Centers.Count != 0)
         {
             GLHelper.InitDebugMat();
-            foreach(Center c in m_Centers)
+            GL.LoadOrtho();
+            GL.PushMatrix();
+            foreach (Center c in m_Centers)
             {
                 foreach(Edge edge in c.Borders)
                 {
                     if(edge.v0 != null && edge.v1 != null)
                     {
-                        GLHelper.DrawLine(new Vector3(c.Point.x, c.Point.y, 0), new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
+                        //GLHelper.DrawLine(new Vector3(c.Point.x, c.Point.y, 0), new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
                         GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0));
                     }
                 }
                 GLHelper.DrawCircle(c.Point.x, c.Point.y, 0, 1f, 0.5f);
+                //break;
             }
+            GL.PopMatrix();
             //m_Centers = null;
         }
 

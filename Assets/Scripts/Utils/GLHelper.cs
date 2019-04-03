@@ -27,14 +27,14 @@ public class GLHelper
 
     public static void DrawLine(Vector3 startPoint, Vector3 endPoint)
     {
-        GL.LoadOrtho();
-        GL.PushMatrix();
+        //GL.LoadOrtho();
+        //GL.PushMatrix();
         GL.Begin(GL.LINES);
         GL.Color(Color.green);
         GL.Vertex(new Vector3(startPoint.x / Screen.width, startPoint.y / Screen.height, 0));
         GL.Vertex(new Vector3(endPoint.x / Screen.width, endPoint.y / Screen.height, 0));
         GL.End();
-        GL.PopMatrix();
+        //GL.PopMatrix();
     }
 
     public static void DrawCircle(float x, float y, float z, float r, float accuracy)
