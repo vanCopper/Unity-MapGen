@@ -427,7 +427,7 @@ public class Map
 
         for(int i = 0; i < locations.Count; i++)
         {
-            y = i / (double)(locations.Count - 1);
+            y = (double)i / (double)(locations.Count - 1);
             x = System.Math.Sqrt(SCALE_FACTOR) - System.Math.Sqrt(SCALE_FACTOR * (1-y));
             if (x > 1.0) x = 1.0;
             locations[i].Elevation = x;
@@ -521,7 +521,7 @@ public class Map
                 sumElevation += q.Elevation;
             }
 
-            p.Elevation = (double)(sumElevation / p.Corners.Count);
+            p.Elevation = sumElevation / (double)p.Corners.Count;
         }
     }
 
@@ -554,7 +554,7 @@ public class Map
                 q.Watershed = q.Downslope;
             }
         }
-
+        //TODO: 100根据点数多少 可变
         for(int i = 0; i < 100; i++)
         {
             changed = false;

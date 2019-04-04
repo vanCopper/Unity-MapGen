@@ -48,7 +48,7 @@ public class IsLandShape
             float px = (q.x + 1) * 128;
             float py = (q.y + 1) * 128;
 
-            double c = Mathf.PerlinNoise(px, py);
+            double c = Mathf.PerlinNoise(px + seed, py + seed);
             return c > (0.3+0.3*q.magnitude*q.magnitude);
         }
 
