@@ -54,7 +54,7 @@ public class MapGen : MonoBehaviour
     void Start()
     {
         m_Map = new Map(m_MapSize);
-        m_Map.NewIsLand(IsLandShapeType.Perlin, PointType.Relaxed, m_NumPoints, m_IslandSeedInitial, m_Variant);
+        m_Map.NewIsLand(IsLandShapeType.Radial, PointType.Square, m_NumPoints, m_IslandSeedInitial, m_Variant);
         m_Map.Reset();
         m_Map.MapGen();
         m_Map.AssignBiomes();
