@@ -62,6 +62,31 @@ public class Map
         voronoi.Dispose();
         voronoi = null;
         Points = null;
+        AssignBiomes();
+        
+        //////////////////////////////////////
+        AssignCornerElevations();
+        AssignOceanCoastAndLand();
+        RedistributeElevations(landCorners(Corners));
+        foreach (Corner q in Corners)
+        {
+            if(q.Ocean || q.Coast)
+            {
+                q.Elevation = 0;
+            }
+        }
+        AssignPolygonElevations();
+
+        CalculateDownslopes();
+        CalculateWatersheds();
+        CreateRivers();
+        
+
+        AssignCornerMoisture();
+        RedistributeMoisture(landCorners(Corners));
+        AssignPolygonMoisture();
+        //////////////////////////////////////
+        AssignBiomes();
     }
 
     public void Reset()
@@ -395,14 +420,14 @@ public class Map
 
     public void RedistributeElevations(List<Corner> locations)
     {
-        double SCALE_FACTOR = 1.1f;
+        double SCALE_FACTOR = 1.1;
         double y;
         double x;
         locations.Sort((a,b) => a.Elevation.CompareTo(b.Elevation));
 
         for(int i = 0; i < locations.Count; i++)
         {
-            y = i / locations.Count - 1;
+            y = i / (double)(locations.Count - 1);
             x = System.Math.Sqrt(SCALE_FACTOR) - System.Math.Sqrt(SCALE_FACTOR * (1-y));
             if (x > 1.0) x = 1.0;
             locations[i].Elevation = x;
@@ -414,7 +439,8 @@ public class Map
         locations.Sort((a, b) => a.Moisture.CompareTo(b.Moisture));
         for(int i = 0; i<locations.Count; i++)
         {
-            locations[i].Moisture = i / locations.Count - 1;
+            double moisture = (double)i / (double)(locations.Count - 1);
+            locations[i].Moisture = moisture;
         }
     }
 
@@ -495,7 +521,7 @@ public class Map
                 sumElevation += q.Elevation;
             }
 
-            p.Elevation = sumElevation / p.Corners.Count;
+            p.Elevation = (double)(sumElevation / p.Corners.Count);
         }
     }
 
@@ -544,7 +570,7 @@ public class Map
                     }
                 }
             }
-            if (changed) break;
+            if (!changed) break;
         }
 
         foreach(Corner q in Corners)
@@ -562,7 +588,7 @@ public class Map
         {
             q = Corners[(int)ParkMillerRng.NextIntRange(0, Corners.Count - 1)];
             if (q.Ocean || q.Elevation < 0.3 || q.Elevation > 0.9) continue;
-            while(!q.Coast)
+            while (!q.Coast)
             {
                 if (q == q.Downslope) break;
 
@@ -625,7 +651,7 @@ public class Map
                 if (q.Moisture > 1.0) q.Moisture = 1.0;
                 sumMoisture += q.Moisture;
             }
-            p.Moisture = sumMoisture / p.Corners.Count;
+            p.Moisture = (double)(sumMoisture / (double)p.Corners.Count);
         }
     }
 

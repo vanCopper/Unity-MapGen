@@ -13,8 +13,14 @@ public class Center
     public int Index;
     public Vector2f Point;      // 位置
     public bool Water;          // 湖或者海洋
-    public bool Ocean;          // 海洋
-    public bool Coast;          // 海岸线
+    /// <summary>
+    /// 海洋
+    /// </summary>
+    public bool Ocean;          
+    /// <summary>
+    /// 海岸线
+    /// </summary>
+    public bool Coast;          
     public bool Border;         // 是否为地图边缘
     public string Biome;        // 生态群类型
     public double Elevation;     // 海拔 0.0 - 1.0

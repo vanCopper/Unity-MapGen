@@ -37,12 +37,34 @@ public class GLHelper
         //GL.PopMatrix();
     }
 
+    public static void DrawTriangles(List<Vector3> triangles, Color color)
+    {
+        GL.Begin(GL.TRIANGLES);
+        GL.Color(color);
+        foreach(Vector3 v in triangles)
+        {
+            GL.Vertex(new Vector3(v.x / Screen.width, v.y / Screen.height, 0));
+        }
+        GL.End();
+    }
+
+    public static void DrawQuads(List<Vector3> quads, Color color)
+    {
+        GL.Begin(GL.QUADS);
+        GL.Color(color);
+        foreach(Vector3 v in quads)
+        {
+            GL.Vertex(new Vector3(v.x / Screen.width, v.y / Screen.height, 0));
+        }
+        GL.End();
+    }
+
     public static void DrawCircle(float x, float y, float z, float r, float accuracy, Color color)
     {
         //GL.Clear(false, true, Color.blue);
-        GL.PushMatrix();
+        //GL.PushMatrix();
         //绘制2D图像    
-        GL.LoadOrtho();
+        //GL.LoadOrtho();
 
         float stride = r * accuracy;
         float size = 1 / accuracy;
@@ -94,6 +116,6 @@ public class GLHelper
             y1 = y3;
             y2 = y4;
         }
-        GL.PopMatrix();
+        //GL.PopMatrix();
     }
 }
