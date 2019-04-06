@@ -28,7 +28,7 @@ public delegate List<Vector2f> PointGen(int numPoints);
 
 public class Map
 {
-    public static float LAKE_THRESHOLD = 0.3f;
+    public static float LAKE_THRESHOLD = 0.1f;
 
     public int MapSize;
     public ParkMillerRNG ParkMillerRng = new ParkMillerRNG();
@@ -56,18 +56,29 @@ public class Map
     public void MapGen()
     {
         Points = PointSelectorGen(NumPoints);
+
+        for(int i = 0; i < 2; i++)
+        {
+            Points = Voronoi.RelaxPoints(Points, new Rectf(0, 0, MapSize, MapSize));
+        }
         Voronoi voronoi = new Voronoi(Points, new Rectf(0, 0, MapSize, MapSize));
         BuildGraph(Points, voronoi);
-        ImproveCorners();
+        //ImproveCorners();
         voronoi.Dispose();
         voronoi = null;
         Points = null;
-        AssignBiomes();
+
+
         
         //////////////////////////////////////
         AssignCornerElevations();
+
         AssignOceanCoastAndLand();
+        AssignBiomes();
+        //return;
         RedistributeElevations(landCorners(Corners));
+       
+
         foreach (Corner q in Corners)
         {
             if(q.Ocean || q.Coast)
@@ -235,9 +246,9 @@ public class Map
             centerLookup.Add(point, p);
         }
 
-        foreach(Center p in Centers)
+        foreach(Center tp in Centers)
         {
-            voronoi.Region(p.Point);
+            voronoi.Region(tp.Point);
         }
 
         Dictionary<int, List<Corner>> _cornerMap = new Dictionary<int, List<Corner>>();
@@ -276,8 +287,8 @@ public class Map
             q.Index = Corners.Count;
             Corners.Add(q);
             q.Point = point;
-            q.Border = (point.x == 0 || point.x == MapSize
-                        || point.y == 0 || point.y == MapSize);
+            q.Border = point.x == 0 || point.x == MapSize
+                        || point.y == 0 || point.y == MapSize;
             q.Touches = new List<Center>();
             q.Protrudes = new List<Edge>();
             q.Adjacent = new List<Corner>();

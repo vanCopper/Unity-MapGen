@@ -17,7 +17,7 @@ public class MapGen : MonoBehaviour
     private static uint m_Variant = 8;
     // Point distribution
     //private string m_PointType = "Relaxed";
-    private int m_NumPoints = 1000;
+    private int m_NumPoints = 500;
     // Start is called before the first frame update
     private void Awake()
     {
@@ -54,7 +54,7 @@ public class MapGen : MonoBehaviour
     void Start()
     {
         m_Map = new Map(m_MapSize);
-        m_Map.NewIsLand(IsLandShapeType.Radial, PointType.Square, m_NumPoints, m_IslandSeedInitial, m_Variant);
+        m_Map.NewIsLand(IsLandShapeType.Radial, PointType.Relaxed, m_NumPoints, m_IslandSeedInitial, m_Variant);
         m_Map.Reset();
         m_Map.MapGen();
         m_Map.AssignBiomes();
@@ -80,7 +80,7 @@ public class MapGen : MonoBehaviour
         {
             foreach (Vector2f p in m_Points)
             {
-                GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.5f, Color.black);
+                GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.5f, Color.red);
             }
         }
 
@@ -93,7 +93,7 @@ public class MapGen : MonoBehaviour
                 {
                     if (edge.v0 != null && edge.v1 != null)
                     {
-                        GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.green);
+                        GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.black);
                         triangles.Add(new Vector3(c.Point.x, c.Point.y, 0));
                         triangles.Add(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
                         triangles.Add(new Vector3(edge.MidPoint.x, edge.MidPoint.y, 0));
@@ -102,6 +102,12 @@ public class MapGen : MonoBehaviour
                         triangles.Add(new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0));
                         triangles.Add(new Vector3(edge.MidPoint.x, edge.MidPoint.y, 0));
                     }
+
+                    // 渲染三角形
+                    //if(edge.d0 != null && edge.d1 != null)
+                    //{
+                    //    GLHelper.DrawLine(new Vector3(edge.d0.Point.x, edge.d0.Point.y, 0), new Vector3(edge.d1.Point.x, edge.d1.Point.y, 0), Color.black);
+                    //}
                 }
 
                 //Debug.LogFormat("{0}_{1}", c.Moisture, c.Biome);

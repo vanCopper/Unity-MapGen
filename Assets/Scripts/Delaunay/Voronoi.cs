@@ -296,7 +296,32 @@ namespace csDelaunay {
 			vertices.Clear();
 		}
 
-		public void LloydRelaxation(int nbIterations) {
+        public static List<Vector2f> RelaxPoints(List<Vector2f> startingPoints, Rectf rectf)
+        {
+            Voronoi v = new Voronoi(startingPoints, rectf);
+            List<Vector2f> points = new List<Vector2f>();
+            for(int i = 0; i <startingPoints.Count; i++)
+            {
+                Vector2f point = startingPoints[i];
+                var region = v.Region(point);
+                point.x = 0f;
+                point.y = 0f;
+              
+                foreach (var r in region)
+                {
+                    point.x = point.x + r.x;
+                    point.y = point.y + r.y;
+                }
+
+                point.x = point.x / region.Count;
+                point.y =  point.y / region.Count;
+                points.Add(point);
+            }
+
+            return points;
+        }
+
+        public void LloydRelaxation(int nbIterations) {
 			// Reapeat the whole process for the number of iterations asked
 			for (int i = 0; i < nbIterations; i++) {
 				List<Vector2f> newPoints = new List<Vector2f>();
