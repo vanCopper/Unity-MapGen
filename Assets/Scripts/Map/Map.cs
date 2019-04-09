@@ -68,16 +68,10 @@ public class Map
         voronoi = null;
         Points = null;
 
-
-        
         //////////////////////////////////////
         AssignCornerElevations();
-
         AssignOceanCoastAndLand();
-        AssignBiomes();
-        //return;
         RedistributeElevations(landCorners(Corners));
-       
 
         foreach (Corner q in Corners)
         {
@@ -86,12 +80,14 @@ public class Map
                 q.Elevation = 0;
             }
         }
+        // Center的海拔值为所在多边形所有Corner海拔值的平均值
         AssignPolygonElevations();
-
+        AssignBiomes();
+        ///////////////////////////////////////
+        
         CalculateDownslopes();
         CalculateWatersheds();
         CreateRivers();
-        
 
         AssignCornerMoisture();
         RedistributeMoisture(landCorners(Corners));
@@ -381,6 +377,10 @@ public class Map
         }
     }
 
+    /// <summary>
+    /// 设置Voronoi corners的海拔值以及是否为水
+    /// </summary>
+    /// <returns></returns>
     public void AssignCornerElevations()
     {
         //List<Corner> queue = new List<Corner>();
@@ -395,8 +395,8 @@ public class Map
         {
             if(q.Border)
             {
-                q.Elevation = 0;
-                queue.Push(q);
+                q.Elevation = 0;    //地图边缘海拔值为 0
+                queue.Push(q);      //地图边缘的角
             }else
             {
                 q.Elevation = float.PositiveInfinity;
@@ -407,7 +407,7 @@ public class Map
         {
             Corner q = queue.Pop();
 
-            foreach(Corner s in q.Adjacent)
+            foreach(Corner s in q.Adjacent) // 从边缘角通过相邻角向里收缩 
             {
                 double newElevation = 0.01f + q.Elevation;
                 if(!q.Water && !s.Water)
@@ -415,6 +415,7 @@ public class Map
                     newElevation += 1;
                     if(NeedsMoreRandomness)
                     {
+                        // 如果是Square或Hexagon类型地图，海拔加入随机以确保后面河流的生成有足够的随机性
                         newElevation += ParkMillerRng.NextDouble();
                     }
                 }
@@ -455,6 +456,9 @@ public class Map
         }
     }
 
+    /// <summary>
+    /// 确定当前多边形是 海洋/海岸线/陆地
+    /// </summary>
     public void AssignOceanCoastAndLand()
     {
         Stack<Center> queue = new Stack<Center>();
@@ -464,7 +468,7 @@ public class Map
             numWater = 0;
             foreach(Corner q in p.Corners)
             {
-                if(q.Border)
+                if(q.Border)// 边缘的Center均为海洋，Corner均为水
                 {
                     p.Border = true;
                     p.Ocean = true;
@@ -484,6 +488,7 @@ public class Map
         while(queue.Count > 0)
         {
             Center p = queue.Pop();
+            // 连接海洋节点的水节点 均为海洋
             foreach(Center r in p.Neighbors)
             {
                 if(r.Water && !r.Ocean)
@@ -498,6 +503,7 @@ public class Map
         {
             int numOcena = 0;
             int numLand = 0;
+            // 连接海洋节点和陆地节点的节点为海岸线
             foreach(Center r in p.Neighbors)
             {
                 if (r.Ocean) numOcena++;
@@ -515,6 +521,7 @@ public class Map
                 if (p.Ocean) numOcean++;
                 if (!p.Water) numLand++;
             }
+            // 设置Corner属性
             c.Ocean = (numOcean == c.Touches.Count);
             c.Coast = (numOcean > 0) && (numLand > 0);
             c.Water = c.Border || ((numLand != c.Touches.Count) && !c.Coast);
