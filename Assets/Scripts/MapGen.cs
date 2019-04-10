@@ -53,6 +53,7 @@ public class MapGen : MonoBehaviour
     }
     void Start()
     {
+        GLHelper.InitDebugMat();
         m_Map = new Map(m_MapSize);
         m_Map.NewIsLand(IsLandShapeType.Radial, PointType.Relaxed, m_NumPoints, m_IslandSeedInitial, m_Variant);
         m_Map.Reset();
@@ -60,27 +61,29 @@ public class MapGen : MonoBehaviour
         m_Map.AssignBiomes();
         m_Points = m_Map.Points;
         m_Centers = m_Map.Centers;
-        Debug.Log(m_Points);
+        //Debug.Log(m_Points);
     }
 
     // Update is called once per frame
     void Update()
     {
-
+      
     }
 
     private void OnPostRender()
     {
         //GL
-        GLHelper.InitDebugMat();
+        //GL.Clear(true, true, Color.black);
         GL.LoadOrtho();
+        GLHelper.m_DebugMat.SetPass(0);
         GL.PushMatrix();
+       
 
         if (m_Points != null && m_Points.Count != 0)
         {
             foreach (Vector2f p in m_Points)
             {
-                GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.5f, Color.red);
+                //GLHelper.DrawCircle(p.x, p.y, 0, 1f, 0.5f, Color.red);
             }
         }
 
@@ -88,12 +91,13 @@ public class MapGen : MonoBehaviour
         {
             foreach (Center c in m_Centers)
             {
+                
                 List<Vector3> triangles = new List<Vector3>();
                 foreach (Edge edge in c.Borders)
                 {
                     if (edge.v0 != null && edge.v1 != null)
                     {
-                        GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.black);
+                        //GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.black);
                         triangles.Add(new Vector3(c.Point.x, c.Point.y, 0));
                         triangles.Add(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
                         triangles.Add(new Vector3(edge.MidPoint.x, edge.MidPoint.y, 0));
@@ -111,7 +115,7 @@ public class MapGen : MonoBehaviour
                 }
 
                 //Debug.LogFormat("{0}_{1}", c.Moisture, c.Biome);
-                //GLHelper.DrawCircle(c.Point.x, c.Point.y, 0, 1f, 0.5f, Color.red);
+                //GLHelper.DrawCircle(c.Point.x, c.Point.y, 0, 1f, 0.5f, c.ElevationColor());
                 foreach (Corner corner in c.Corners)
                 {
                     //GLHelper.DrawCircle(corner.Point.x, corner.Point.y, 0, 1.5f, 0.5f, Color.white);
@@ -129,10 +133,15 @@ public class MapGen : MonoBehaviour
                     }
                 }
                 else { DisplayColor.TryGetValue(c.Biome, out pColor); }
+
+                // 渲染多边形
+                pColor = c.ElevationColor(); // 海拔图
                 GLHelper.DrawTriangles(triangles, pColor);
             }
         }
+        
         GL.PopMatrix();
+
     }
 
     private static Color ParseColor(string strColor)

@@ -319,10 +319,11 @@ public class Map
                 edge.MidPoint = Map.Lerp(vedge.p0, vedge.p1, 0.5f);
             }
 
-            // 边指向角
+            // 边对应的两个角
             edge.v0 = makeCorner(vedge.p0);
             edge.v1 = makeCorner(vedge.p1);
-            // 边指向中心
+
+            // 穿过该边的三角形边对应的两个点
             Center d0Center;
             if(centerLookup.TryGetValue(dedge.p0, out d0Center))
             {
@@ -334,7 +335,7 @@ public class Map
                 edge.d1 = d1Center;
             }
 
-            //中心指向边，角指向边
+            //点对应的边，角对应的边
             if (edge.d0 != null) edge.d0.Borders.Add(edge);
             if (edge.d1 != null) edge.d1.Borders.Add(edge);
             if (edge.v0 != null) edge.v0.Protrudes.Add(edge);

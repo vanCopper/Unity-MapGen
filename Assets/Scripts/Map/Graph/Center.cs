@@ -36,4 +36,10 @@ public class Center
         if (Borders != null) Borders.Clear();
         if (Corners != null) Corners.Clear();
     }
+
+    public Color ElevationColor()
+    {
+        float g = (float)Elevation;
+        return new Color(g, g, g);
+    }
 }

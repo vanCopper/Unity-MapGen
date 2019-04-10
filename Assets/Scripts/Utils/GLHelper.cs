@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public class GLHelper
 {
-    private static Material m_DebugMat;
+    public static Material m_DebugMat;
 
     public static void InitDebugMat()
     {
@@ -22,13 +22,14 @@ public class GLHelper
         m_DebugMat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
         m_DebugMat.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
         m_DebugMat.SetInt("_ZWrite", 0);
-        m_DebugMat.SetPass(0);
+       
     }
 
     public static void DrawLine(Vector3 startPoint, Vector3 endPoint, Color color)
     {
         //GL.LoadOrtho();
         //GL.PushMatrix();
+        //m_DebugMat.SetPass(0);
         GL.Begin(GL.LINES);
         GL.Color(color);
         GL.Vertex(new Vector3(startPoint.x / Screen.width, startPoint.y / Screen.height, 0));
@@ -41,7 +42,7 @@ public class GLHelper
     {
         GL.Begin(GL.TRIANGLES);
         GL.Color(color);
-        foreach(Vector3 v in triangles)
+        foreach (Vector3 v in triangles)
         {
             GL.Vertex(new Vector3(v.x / Screen.width, v.y / Screen.height, 0));
         }
