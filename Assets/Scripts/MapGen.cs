@@ -17,7 +17,7 @@ public class MapGen : MonoBehaviour
     private static uint m_Variant = 8;
     // Point distribution
     //private string m_PointType = "Relaxed";
-    private int m_NumPoints = 500;
+    private int m_NumPoints = 1000;
     // Start is called before the first frame update
     private void Awake()
     {
