@@ -403,7 +403,7 @@ public class Map
                 q.Elevation = float.PositiveInfinity;
             }
         }
-
+       // queue存储了边缘角
        while(queue.Count > 0)
         {
             Corner q = queue.Pop();

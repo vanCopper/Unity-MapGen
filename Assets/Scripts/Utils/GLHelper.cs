@@ -38,6 +38,32 @@ public class GLHelper
         //GL.PopMatrix();
     }
 
+    public static void DrawLineWithThickness(Vector3 startPoint, Vector3 endPoint, Color color, float thickness)
+    {
+        float startScreenX = startPoint.x / Screen.width;
+        float startScreenY = startPoint.y / Screen.height;
+        float endScreenX = endPoint.x / Screen.width;
+        float endScreenY = endPoint.y / Screen.height;
+
+        Vector3 start = new Vector3(startScreenX, startScreenY, 0);
+        Vector3 end = new Vector3(endScreenX, endScreenY, 0);
+        Vector3 p = end - start;
+        Vector3 normal = new Vector3(-p.y, p.x, 0).normalized;
+
+        Vector3 a = start - thickness * normal;
+        Vector3 b = start + thickness * normal;
+        Vector3 c = end - thickness * normal;
+        Vector3 d = end + thickness * normal;
+
+        GL.Begin(GL.QUADS);
+        GL.Color(color);
+        GL.Vertex(a);
+        GL.Vertex(b);
+        GL.Vertex(c);
+        GL.Vertex(d);
+        GL.End();
+    }
+
     public static void DrawTriangles(List<Vector3> triangles, Color color)
     {
         GL.Begin(GL.TRIANGLES);

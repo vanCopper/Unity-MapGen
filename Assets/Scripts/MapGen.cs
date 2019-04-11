@@ -97,7 +97,15 @@ public class MapGen : MonoBehaviour
                 {
                     if (edge.v0 != null && edge.v1 != null)
                     {
-                        //GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.black);
+                        if(edge.River > 0)
+                        {
+                            GLHelper.DrawLineWithThickness(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), 
+                                new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), DisplayColor["RIVER"], 0.003f);
+                        }
+                        else
+                        {
+                            //GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.black);
+                        }
                         triangles.Add(new Vector3(c.Point.x, c.Point.y, 0));
                         triangles.Add(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
                         triangles.Add(new Vector3(edge.MidPoint.x, edge.MidPoint.y, 0));
