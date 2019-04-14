@@ -103,7 +103,7 @@ public class MapGen : MonoBehaviour
                             //    new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), DisplayColor["RIVER"]);
 
                             GLHelper.DrawLineWithThickness(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0),
-                                new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), DisplayColor["RIVER"], 0.0035f);
+                                new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), DisplayColor["RIVER"], 0.0025f);
                         }
                         else
                         {
