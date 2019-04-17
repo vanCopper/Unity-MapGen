@@ -146,3 +146,114 @@ public void CreateRivers()
 }
 ```
 
+随机获取已有的多边形且该多边形是水但不是海洋，并且海拔的取值范围限定在0.3~0.9。然后通过前面建立的Downslope节点，将水流一直延续到海洋。上图中蓝色的线条即为生成的水流。
+
+#### 湿度(Moisture)
+
+![](./images/mapGen_12.png)
+
+根据河流的分布来计算湿度分布，越是靠近海洋，河流，湖的地方湿度越大。如图绿色越深则湿度越大。结合河流分布来看会更加清晰。
+
+```c#
+public void AssignCornerMoisture()
+    {
+        Stack<Corner> queue = new Stack<Corner>();
+        double newMoisture;
+        foreach(Corner q in Corners)
+        {
+            if((q.Water || q.River > 0) && !q.Ocean)
+            {
+                q.Moisture = q.River > 0 ? Mathf.Min(3.0f, (0.2f * q.River)) : 1.0f;
+                queue.Push(q);
+            }else
+            {
+                q.Moisture = 0.0;
+            }
+        }
+        
+        while(queue.Count > 0)
+        {
+            Corner q = queue.Pop();
+            foreach(Corner r in q.Adjacent)
+            {
+                newMoisture = q.Moisture * 0.9;
+                if(newMoisture > r.Moisture)
+                {
+                    r.Moisture = newMoisture;
+                    queue.Push(r);
+                }
+            }
+        }
+        
+        foreach(Corner q in Corners)
+        {
+            if(q.Ocean || q.Coast)
+            {
+                q.Moisture = 1.0;
+            }
+        }
+    }
+```
+
+#### 生物类群(Biomes)
+
+接下来将海拔和湿度数据结合起来，这样就可以得到不同区域所对应的生态环境，以及生物类群的分布。
+
+![](./images/mapGen_13.png)
+
+```c#
+public static string GetBiome(Center p)
+    {
+        if (p.Ocean)
+        {
+            return "OCEAN";
+        }
+        else if (p.Water)
+        {
+            if (p.Elevation < 0.1) return "MARSH";
+            if (p.Elevation > 0.8) return "ICE";
+            return "LAKE";
+        }
+        else if (p.Coast)
+        {
+            return "BEACH";
+        }
+        else if (p.Elevation > 0.8)
+        {
+            if (p.Moisture > 0.50) return "SNOW";
+            else if (p.Moisture > 0.33) return "TUNDRA";
+            else if (p.Moisture > 0.16) return "BARE";
+            else return "SCORCHED";
+        }
+        else if (p.Elevation > 0.6)
+        {
+            if (p.Moisture > 0.66) return "TAIGA";
+            else if (p.Moisture > 0.33) return "SHRUBLAND";
+            else return "TEMPERATE_DESERT";
+        }
+        else if (p.Elevation > 0.3)
+        {
+            if (p.Moisture > 0.83) return "TEMPERATE_RAIN_FOREST";
+            else if (p.Moisture > 0.50) return "TEMPERATE_DECIDUOUS_FOREST";
+            else if (p.Moisture > 0.16) return "GRASSLAND";
+            else return "TEMPERATE_DESERT";
+        }
+        else
+        {
+            if (p.Moisture > 0.66) return "TROPICAL_RAIN_FOREST";
+            else if (p.Moisture > 0.33) return "TROPICAL_SEASONAL_FOREST";
+            else if (p.Moisture > 0.16) return "GRASSLAND";
+            else return "SUBTROPICAL_DESERT";
+        }
+    }
+```
+
+![](./images/mapGen_14.png)
+
+至此，我们已经有了一张相对完整的地图。接下来，这些地图数据将会在游戏中使用。
+
+> Polygonal Map Generation for Games : http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/
+>
+> Generating fantasy maps : http://mewo2.com/notes/terrain/
+>
+> GitHub: https://github.com/vanCopper/Unity-MapGen

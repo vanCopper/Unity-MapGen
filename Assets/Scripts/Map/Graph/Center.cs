@@ -42,4 +42,14 @@ public class Center
         float g = (float)Elevation;
         return new Color(g, g, g);
     }
+
+    public Color MoistureColor()
+    {
+        float g = (float)Moisture;
+        if(Mathf.Approximately(g, 1.0f))
+        {
+            return new Color(0.2f, 0.2f, 0.4f);
+        }
+        return new Color(1.0f - g, 1.0f, 1.0f - g);
+    }
 }

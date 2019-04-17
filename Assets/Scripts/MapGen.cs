@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor;
+using System.IO;
 
 public class MapGen : MonoBehaviour
 {
@@ -146,7 +148,7 @@ public class MapGen : MonoBehaviour
                 else { DisplayColor.TryGetValue(c.Biome, out pColor); }
 
                 // 渲染多边形
-                pColor = c.ElevationColor(); // 海拔图
+                //pColor = c.MoistureColor(); // 海拔图
                 GLHelper.DrawTriangles(triangles, pColor);
             }
         }
