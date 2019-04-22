@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 using System.IO;
+using System;
 
 public class MapGen : MonoBehaviour
 {
-    private static Dictionary<string, Color> DisplayColor = new Dictionary<string, Color>(); 
+    private static Dictionary<string, Color> DisplayColor = new Dictionary<string, Color>();
+    private static Dictionary<string, string> DebugBiomes = new Dictionary<string, string>();
     private Material m_DebugMat;
     private Map m_Map;
     private int m_MapSize = 512;
@@ -38,6 +40,20 @@ public class MapGen : MonoBehaviour
         DisplayColor.Add("BRIDGE", ParseColor("#686860"));     //桥
         DisplayColor.Add("LAVA", ParseColor("#cc3333"));       //熔岩
 
+        DebugBiomes.Add("OCEAN", "a");      //海洋
+        DebugBiomes.Add("COAST", "b");      //海岸
+        DebugBiomes.Add("LAKESHORE", "c");  //湖岸
+        DebugBiomes.Add("LAKE", "d");       //湖泊
+        DebugBiomes.Add("RIVER", "e");      //河
+        DebugBiomes.Add("MARSH", "f");      //沼泽
+        DebugBiomes.Add("ICE", "g");        //冰
+        DebugBiomes.Add("BEACH", "h");      //海滩
+        DebugBiomes.Add("ROAD1", "i");      //道路 1
+        DebugBiomes.Add("ROAD2", "j");      //道路 2
+        DebugBiomes.Add("ROAD3", "k");      //道路 3
+        DebugBiomes.Add("BRIDGE", "l");     //桥
+        DebugBiomes.Add("LAVA", "m");       //熔岩
+
         //Terrain
         DisplayColor.Add("SNOW", ParseColor("#ffffff"));       //雪
         DisplayColor.Add("TUNDRA", ParseColor("#bbbbaa"));     //冻土地带
@@ -52,6 +68,20 @@ public class MapGen : MonoBehaviour
         DisplayColor.Add("SUBTROPICAL_DESERT", ParseColor("#d2b98b"));         //亚热带沙漠
         DisplayColor.Add("TROPICAL_RAIN_FOREST", ParseColor("#337755"));       //热带雨林
         DisplayColor.Add("TROPICAL_SEASONAL_FOREST", ParseColor("#559944"));   //热带季节性森林
+
+        DebugBiomes.Add("SNOW", "n");       //雪
+        DebugBiomes.Add("TUNDRA", "o");     //冻土地带
+        DebugBiomes.Add("BARE", "p");
+        DebugBiomes.Add("SCORCHED", "q");   //烧焦
+        DebugBiomes.Add("TAIGA", "r");      //针叶树林地带
+        DebugBiomes.Add("SHRUBLAND", "s");  //灌木丛
+        DebugBiomes.Add("TEMPERATE_DESERT", "t");       //温带森林
+        DebugBiomes.Add("TEMPERATE_RAIN_FOREST", "u");  //温带雨林
+        DebugBiomes.Add("TEMPERATE_DECIDUOUS_FOREST", "v"); //温带落叶林
+        DebugBiomes.Add("GRASSLAND", "w");                  //草原
+        DebugBiomes.Add("SUBTROPICAL_DESERT", "x");         //亚热带沙漠
+        DebugBiomes.Add("TROPICAL_RAIN_FOREST", "y");       //热带雨林
+        DebugBiomes.Add("TROPICAL_SEASONAL_FOREST", "z");   //热带季节性森林
     }
     void Start()
     {
@@ -64,6 +94,19 @@ public class MapGen : MonoBehaviour
         m_Points = m_Map.Points;
         m_Centers = m_Map.Centers;
         //Debug.Log(m_Points);
+        string[,] gridTypes = new string[256, 256];
+        string result = "";
+        for(int i = 0; i < 256; i++)
+        {
+            result += Environment.NewLine;
+            for (int j = 0; j < 256; j++)
+            {
+                gridTypes[i, j] = GetGridType(i, j);
+                //result += DebugBiomes[gridTypes[i, j]];
+            }
+        }
+
+        Debug.Log(result);
     }
 
     // Update is called once per frame
@@ -109,7 +152,7 @@ public class MapGen : MonoBehaviour
                         }
                         else
                         {
-                            //GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.black);
+                            GLHelper.DrawLine(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0), new Vector3(edge.v1.Point.x, edge.v1.Point.y, 0), Color.black);
                         }
                         triangles.Add(new Vector3(c.Point.x, c.Point.y, 0));
                         triangles.Add(new Vector3(edge.v0.Point.x, edge.v0.Point.y, 0));
@@ -162,5 +205,28 @@ public class MapGen : MonoBehaviour
         Color result = Color.white;
         ColorUtility.TryParseHtmlString(strColor, out result);
         return result;
+    }
+
+    public string GetGridType(float gridX, float gridY)
+    {
+        float dist = int.MaxValue;
+        Center closeCenter = new Center();
+        closeCenter.Biome = "OCEAN";
+        // walk over each biomeInfo
+        for (int z = 0; z < m_Map.Centers.Count; z++)
+        {
+
+            float xdiff = m_Map.Centers[z].Point.x - gridX;
+            float ydiff = m_Map.Centers[z].Point.y - gridY;
+
+            float cdist = xdiff * xdiff + ydiff * ydiff;
+
+            if (cdist < dist)
+            {
+                closeCenter = m_Map.Centers[z];
+                dist = cdist;
+            }
+        }
+        return closeCenter.Biome;
     }
 }
